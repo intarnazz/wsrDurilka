@@ -56,11 +56,9 @@ async function loginbyToken() {
   return await fetch('http://wsr/api/loginToken', {
     method: 'POST',
     headers: {
-      'Content-Type': 'Application/json'
+      // 'Content-Type': 'Application/json',
+      'Authorization': `Bearer ${token.value}`,
     },
-    body: JSON.stringify({
-      token: token.value
-    })
   })
     .then((response) => response.json())
     .then((json) => {

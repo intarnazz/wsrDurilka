@@ -1,8 +1,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+const API_URL = import.meta.env.VITE_API_URL
 const text = ref('')
-
 const histori = ref([])
 
 onMounted(() => {})
@@ -10,7 +10,7 @@ onMounted(() => {})
 async function Postmessage() {
   const message = text.value.trim()
   text.value = ''
-  return await fetch('http://wsr/api/message', {
+  return await fetch(`${API_URL}api/message`, {
     method: 'POST',
     headers: {
       'Content-Type': 'Application/json'
@@ -29,8 +29,6 @@ async function Postmessage() {
         contexts: [message],
         request: []
       })
-      console.log(json)
-      console.log(json.responses)
       return json.responses
     })
     .catch((e) => {
@@ -38,11 +36,33 @@ async function Postmessage() {
     })
 }
 
+async function saveChatHistori() {
+  return await fetch(`${API_URL}api/chat`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token.value}`,
+      'Content-Type': 'Application/json'
+    },
+    body: JSON.stringify({
+      chat: histori
+    })
+  })
+    .then((response) => response.json())
+    .then((json) => {
+      return json
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+}
+
+
+
 async function messageSubmit() {
   const request = await Postmessage()
-  console.log(request)
-  console.log(histori.value[histori.value.length - 1])
-  histori.value[histori.value.length - 1].request.push(request)
+  histori.value[histori.value.length - 1].request.push(request.slice(2, request.length - 2))
+
+  await saveChatHistori()
 }
 </script>
 

@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+const API_URL = import.meta.env.VITE_API_URL
 const popapIsOpen = ref(false)
 const flash = ref('')
 const login = ref('')
@@ -11,8 +12,6 @@ const user = ref('')
 onMounted(async () => {
   token.value = JSON.parse(localStorage.getItem('token')).token
   user.value = await loginbyToken()
-  console.log(token.value)
-  console.log(user.value)
 })
 
 function PopapDisplay() {
@@ -33,7 +32,7 @@ function setToken(res) {
 }
 
 async function logining() {
-  return await fetch('http://wsr/api/login', {
+  return await fetch(`${API_URL}api/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'Application/json'
@@ -53,7 +52,7 @@ async function logining() {
 }
 
 async function loginbyToken() {
-  return await fetch('http://wsr/api/loginToken', {
+  return await fetch(`${API_URL}api/loginToken`, {
     method: 'POST',
     headers: {
       // 'Content-Type': 'Application/json',
@@ -62,6 +61,9 @@ async function loginbyToken() {
   })
     .then((response) => response.json())
     .then((json) => {
+      if (json.message) {
+        return none
+      }
       return json
     })
     .catch((e) => {
@@ -70,7 +72,7 @@ async function loginbyToken() {
 }
 
 async function Registation() {
-  return await fetch('http://wsr/api/reg', {
+  return await fetch(`${API_URL}api/reg`, {
     method: 'POST',
     headers: {
       'Content-Type': 'Application/json'
@@ -130,12 +132,16 @@ async function loginSubmit() {
   <header class="boxY">
     <div class="boxY">
       <h2>Дурилка</h2>
-      <button v-if="!token" @click="PopapDisplay" class="button">войти</button>
+      <button v-if="!user" @click="PopapDisplay" class="button">войти</button>
       <div v-else class="">
         <p>Пользователь: {{ user.login }}</p>
       </div>
     </div>
-    <div class="wrapper"></div>
+    <ul v-if="user" class="flex1 boxY">
+      <li class="boxX">
+        <button class="flex1 borderGray">создать новый чат</button>
+      </li>
+    </ul>
   </header>
   <RouterView />
 </template>

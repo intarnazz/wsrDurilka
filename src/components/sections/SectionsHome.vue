@@ -2,10 +2,13 @@
 import { onMounted, ref } from 'vue'
 
 const API_URL = import.meta.env.VITE_API_URL
+const props = defineProps(['token', 'user'])
 const text = ref('')
 const histori = ref([])
 
-onMounted(() => {})
+onMounted(async () => {
+  histori.value = await GetChatHistori()
+})
 
 async function Postmessage() {
   const message = text.value.trim()
@@ -37,18 +40,22 @@ async function Postmessage() {
 }
 
 async function saveChatHistori() {
-  return await fetch(`${API_URL}api/chat`, {
+  console.log(histori.value[histori.value.length - 1].contexts[0])
+  console.log(histori.value[histori.value.length - 1].request[0])
+  return await fetch(`${API_URL}api/chatSet`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token.value}`,
+      Authorization: `Bearer ${props.token}`,
       'Content-Type': 'Application/json'
     },
     body: JSON.stringify({
-      chat: histori
+      contextsStr: histori.value[histori.value.length - 1].contexts[0],
+      requestStr: histori.value[histori.value.length - 1].request[0]
     })
   })
     .then((response) => response.json())
     .then((json) => {
+      console.log(json)
       return json
     })
     .catch((e) => {
@@ -56,7 +63,26 @@ async function saveChatHistori() {
     })
 }
 
-
+async function GetChatHistori() {
+  return await fetch(`${API_URL}api/chatGet`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${props.token}`,
+      'Content-Type': 'Application/json'
+    },
+    body: JSON.stringify({
+      chatNum: 1
+    })
+  })
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json)
+      return json
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+}
 
 async function messageSubmit() {
   const request = await Postmessage()

@@ -56,13 +56,14 @@ async function loginbyToken() {
     method: 'POST',
     headers: {
       // 'Content-Type': 'Application/json',
-      'Authorization': `Bearer ${token.value}`,
-    },
+      Authorization: `Bearer ${token.value}`
+    }
   })
     .then((response) => response.json())
     .then((json) => {
+      console.log(json);
       if (json.message) {
-        return none
+        return null
       }
       return json
     })
@@ -84,6 +85,7 @@ async function Registation() {
   })
     .then((response) => response.json())
     .then((json) => {
+      console.log('login: ', json);
       return json
     })
     .catch((e) => {
@@ -143,7 +145,7 @@ async function loginSubmit() {
       </li>
     </ul>
   </header>
-  <RouterView />
+  <RouterView :token="token" :user="user"/>
 </template>
 
 <style scoped></style>
